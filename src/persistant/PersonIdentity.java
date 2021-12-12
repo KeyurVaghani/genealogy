@@ -1,8 +1,10 @@
 package persistant;
-import services.PersonService;
+
 import java.sql.*;
+import java.util.Map;
 
 public class PersonIdentity {
+    private int personId;
     private String name;
     private String dateOfBirth;
     private String birthLocation;
@@ -10,26 +12,10 @@ public class PersonIdentity {
     private String deathLocation;
     private String gender;
     private String occupation;
-    private String referenceMaterial;
-    private String notes;
 
-    public PersonIdentity(String name,String dateOfBirth,String birthLocation,
-                          String dateOfDeath,String deathLocation,String gender,
-                          String occupation,String referenceMaterial,String notes){
-        this.name = name;
-        this.dateOfBirth = dateOfBirth;
-        this.birthLocation = birthLocation;
-        this.dateOfDeath = dateOfDeath;
-        this.deathLocation = deathLocation;
-        this.gender = gender;
-        this.occupation = occupation;
-        this.referenceMaterial = referenceMaterial;
-        this.notes = notes;
-    }
+    public int getPersonId() {return personId;}
 
-    public PersonIdentity(String name){
-        this.name = name;
-    }
+    public void setPersonId(int personId) {this.personId = personId;}
 
     public String getName() {
         return name;
@@ -87,31 +73,4 @@ public class PersonIdentity {
         this.occupation = occupation;
     }
 
-    public String getReferenceMaterial() {
-        return referenceMaterial;
-    }
-
-    public void setReferenceMaterial(String referenceMaterial) {
-        this.referenceMaterial = referenceMaterial;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public PersonIdentity addPerson(String name) throws SQLException, ClassNotFoundException {
-        PersonIdentity person = new PersonIdentity("");
-        PersonService personService = new PersonService();
-        Connection connect = personService.setConnection();
-        Statement statement = connect.createStatement();
-        statement.execute("INSERT INTO personidentity (personName) values " + "( '"+name+"');");
-        
-        statement.close();
-        connect.close();
-        return person;
-    }
 }
