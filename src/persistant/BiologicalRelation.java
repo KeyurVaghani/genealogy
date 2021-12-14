@@ -4,7 +4,6 @@ import services.SqlConnection;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
@@ -40,6 +39,14 @@ public class BiologicalRelation {
 
     public void setRemoval(String removal) {this.removal = removal;}
 
+    /**
+     * will record the parent child relationship in the database
+     * @param parent : personIdentity object of the parent
+     * @param child : personIdentity object of the child
+     * @return : will return true if the relation is established between parent and child otherwise false
+     * @throws Exception : will throw Exception if parent and/or child is null or either parent or child is not
+     * exist in the database
+     */
     public Boolean recordChild(PersonIdentity parent, PersonIdentity child ) throws Exception {
         if(parent == null || child == null){
             throw new Exception("Invalid parent/child");
@@ -61,6 +68,7 @@ public class BiologicalRelation {
             return false;
         }
 
+        // will search for the relation is already exists or not
         String searchRelation = "SELECT * FROM biologicalParentingRelation WHERE childID="+childId +
                 " AND ancestorId = "+ancestorId +" AND generation =" + 1;
         Statement stmtSearchRelation = connect.createStatement();
@@ -69,10 +77,12 @@ public class BiologicalRelation {
             return false;
         }
 
+        //Insert the childId, ancestorId and its generation difference
         String query = "INSERT INTO biologicalParentingRelation values ("+childId+","+ancestorId+",1)";
         Statement stmtParent = connect.createStatement();
         stmtParent.executeUpdate(query);
 
+        // will retrieve the all ancestors of the parent object
         String findAncestorsQuery = "SELECT * FROM biologicalParentingRelation where childId = "+ancestorId;
         Statement stmtAncestors = connect.createStatement();
         ResultSet rsAncestors = stmtAncestors.executeQuery(findAncestorsQuery);
@@ -85,6 +95,7 @@ public class BiologicalRelation {
             stmtParents.close();
         }
 
+        // will insert the relation between child and its parent's all ancestors
         String findDescendentsQuery = "SELECT * FROM biologicalparentingrelation where ancestorId = "+ childId;
         Statement stmtDescendents = connect.createStatement();
         ResultSet rsDescendentsQuery = stmtDescendents.executeQuery(findDescendentsQuery);
@@ -103,6 +114,14 @@ public class BiologicalRelation {
         return true;
     }
 
+    /**
+     * will record the partnering relation between two person
+     * @param partner1 : PersonIdentity object for partner1
+     * @param partner2 : PersonIdentity object for partner2
+     * @return : will return true if partnering relation is established between two nodes else return false
+     * @throws Exception : will throw the Exception is either partner 1 or partner 2 is null or they not
+     * exist in to the family tree
+     */
     public Boolean recordPartnering( PersonIdentity partner1, PersonIdentity partner2 ) throws Exception {
         if(partner1 == null || partner2 == null){
             throw new Exception("Invalid partner1/partner2");
@@ -137,6 +156,14 @@ public class BiologicalRelation {
         return true;
     }
 
+    /**
+     * will record the dissolution relation between two person
+     * @param partner1 : PersonIdentity object for partner1
+     * @param partner2 : PersonIdentity object for partner2
+     * @return : will return true if dissolution relation is established between two nodes else return false
+     * @throws Exception : will throw the Exception is either partner 1 or partner 2 is null or they not
+     * exist in to the family tree
+     */
     public Boolean recordDissolute( PersonIdentity partner1, PersonIdentity partner2 ) throws Exception {
         if(partner1 == null || partner2 == null){
             throw new Exception("Invalid partner1/partner2");
@@ -171,6 +198,13 @@ public class BiologicalRelation {
         return true;
     }
 
+    /**
+     * will find the descendants of the person to the nth generation
+     * @param person : PersonIdentity object for the person
+     * @param generations : number of generations to consider
+     * @return : will return the list of the descendants of the person with nth generations
+     * @throws Exception :will return Exception if person is null or generations are negative;
+     */
     public Set<PersonIdentity> descendents(PersonIdentity person, Integer generations )
             throws Exception {
         if(person == null){
@@ -204,6 +238,13 @@ public class BiologicalRelation {
         return descendentsList;
     }
 
+    /**
+     * will find the ancestores of the person to the nth generation
+     * @param person : PersonIdentity object for the person
+     * @param generations : number of generations to consider
+     * @return : will return the list of the ancestors of the person with nth generations
+     * @throws Exception :will return Exception if person is null or generations are negative;
+     */
     public Set<PersonIdentity> ancestores(PersonIdentity person, Integer generations )
             throws Exception {
         if(person == null){

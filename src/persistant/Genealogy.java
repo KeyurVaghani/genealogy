@@ -4,12 +4,17 @@ import services.SqlConnection;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
 public class Genealogy {
 
+    /**
+     *will add the person to the database
+     * @param name : name of the person
+     * @return : will return the personIdentity object of the person
+     * @throws Exception : will throw Exception if name is null or empty
+     */
     public PersonIdentity addPerson(String name) throws Exception {
         if(name == null || name.isEmpty()){
             throw new Exception("Invalid name");
@@ -27,6 +32,13 @@ public class Genealogy {
         return person;
     }
 
+    /**
+     * will record the attributes of the person in to the database
+     * @param person : the personIdentity of the person where attributes will be store in to the database
+     * @param attributes : HashMap of the attributes with key and value pair
+     * @return : will return the true if attributes are stored else false
+     * @throws Exception : will throw Exception if person is null ,or it is not found into the database
+     */
     public Boolean recordAttributes(PersonIdentity person,Map<String, String> attributes)
             throws Exception {
         if(person == null){
@@ -41,6 +53,10 @@ public class Genealogy {
 
         int id = findPerson(person.getName()).getPersonId();
 
+        /**
+         * will go through every attribute and check whether it is in the database if not then it will store
+         * the attributes into the database
+         */
         for(String attribute:attributes.keySet()){
             boolean isFound = false;
             StringBuilder attributeKey = new StringBuilder(attribute.toLowerCase());
@@ -57,6 +73,9 @@ public class Genealogy {
                     attributeKey.toString()+"\" and personId ="+id;
             Statement stmtSearchKey = connect.createStatement();
             ResultSet rsSearchQuery = stmtSearchKey.executeQuery(searchKeyQuery);
+            /**
+             * will update the row if the key of the attribute is already there but the value is different
+             */
             while (rsSearchQuery.next()){
                  if(!attributes.get(attribute).equals(rsSearchQuery.getString("attributeValue"))){
                      String updateKeyQuery = "UPDATE attributes SET personId = "+id +", attributeKey = \""+
@@ -83,6 +102,13 @@ public class Genealogy {
      return true;
     }
 
+    /**
+     * will record the reference the people to the database
+     * @param person : the personIdentity object for the person
+     * @param reference : reference for the person to store
+     * @return : will return true if the reference is stored into the database
+     * @throws Exception : will throw Exception if person is null or person is not found in family tree
+     */
     public Boolean recordReference( PersonIdentity person, String reference )
             throws Exception {
         if(person == null){
@@ -111,6 +137,13 @@ public class Genealogy {
         return true;
     }
 
+    /**
+     will record the notes for the people to the database
+     * @param person : the personIdentity object for the person
+     * @param note : note for the person to store
+     * @return : will return true if the note is stored into the database
+     * @throws Exception : will throw Exception if person is null or person is not found in family tree
+     **/
     public Boolean recordNote( PersonIdentity person, String note)
             throws Exception {
         if(person == null){
@@ -139,6 +172,12 @@ public class Genealogy {
         return true;
     }
 
+    /**
+     * will find person by its name
+     * @param name : name of the person
+     * @return : PersonIdentity object of the person
+     * @throws Exception : will throw Exception if name is null or empty, or person is not found in database
+     */
     public PersonIdentity findPerson( String name ) throws Exception {
         if(name == null || name.isEmpty()){
             throw new Exception("name is empty/null");
@@ -162,6 +201,12 @@ public class Genealogy {
         return person;
     }
 
+    /**
+     * will find the person based on personIdentity object
+     * @param id : personIdentity object to search for
+     * @return : will return the name of the person if its in the database
+     * @throws Exception : will throw Exception if id is null or person is not found
+     */
     public String findName(PersonIdentity id) throws Exception {
         if(id == null){
             throw new Exception("id can not be null");
@@ -186,16 +231,25 @@ public class Genealogy {
         return personName.toString();
     }
 
+    /**
+     * will track the biological relation between two person in the group
+     * @param person1 : personIdentity object for person 1
+     * @param person2 : personIdentity object for person 2
+     * @return : will return the biological relation of two person 1 and person 2
+     * @throws Exception : will throw an Exception if person is null or it is not found in the family media
+     */
     public BiologicalRelation findRelation( PersonIdentity person1, PersonIdentity person2 )
             throws Exception {
+        if(person1 == null || person2 == null){
+            throw new Exception("person is null");
+        }
+
         SqlConnection sqlConnection = new SqlConnection();
         Connection connect = sqlConnection.setConnection();
 
-        Genealogy genealogy = new Genealogy();
-
         try {
-            genealogy.findPerson(person1.getName()).getPersonId();
-            genealogy.findPerson(person2.getName()).getPersonId();
+            findPerson(person1.getName()).getPersonId();
+            findPerson(person2.getName()).getPersonId();
         }catch (Exception e){
             throw new Exception("person does not found");
         }
@@ -205,25 +259,31 @@ public class Genealogy {
         String degreeOfCousinship = "None";
         String degreeOfRemoval = "None";
 
-        String person1Query = "SELECT * FROM biologicalrelation where childId = " + person1.getPersonId();
+        String person1Query = "SELECT * FROM biologicalparentingrelation where childId = " + person1.getPersonId();
         Statement stmtPerson1 = connect.createStatement();
         ResultSet rsPerson1 = stmtPerson1.executeQuery(person1Query);
         HashMap<Integer, Integer> person1List = new HashMap<>();
         HashMap<Integer, Integer> person2List = new HashMap<>();
 
         while (rsPerson1.next()) {
-            person1List.put(rsPerson1.getInt("parentId"), rsPerson1.getInt("level"));
+            person1List.put(rsPerson1.getInt("ancestorId"), rsPerson1.getInt("generation"));
         }
         rsPerson1.close();
         stmtPerson1.close();
 
-        String person2Query = "SELECT * FROM biologicalrelation where childId = " + person2.getPersonId();
+        String person2Query = "SELECT * FROM biologicalparentingrelation where childId = " + person2.getPersonId();
         Statement stmtPerson2 = connect.createStatement();
         ResultSet rsPerson2 = stmtPerson2.executeQuery(person2Query);
 
         while (rsPerson2.next()) {
-            person2List.put(rsPerson2.getInt("parentId"), rsPerson2.getInt("level"));
+            person2List.put(rsPerson2.getInt("ancestorId"), rsPerson2.getInt("generation"));
         }
+
+        /**
+         * find if the person 1 is ancestor or person 2 is ancestor
+         * ,or it will check the generations between two persons and
+         * count the degree of cousinship and degree of removal
+        */
 
         if (person2List.containsKey(person1.getPersonId())) {
             person1Level = 0;
@@ -262,6 +322,13 @@ public class Genealogy {
 
         return relation;
     }
+
+    /**
+     * it will find the notes and references for particular person from the database
+     * @param person : personIdentity object for person
+     * @return : will return notes and references for given person object
+     * @throws Exception : will throw Exception if person is null or person is not found
+     */
 
     public List<String> notesAndReferences(PersonIdentity person ) throws Exception {
         if(person == null){

@@ -1,76 +1,34 @@
 package persistant;
 
-import java.sql.*;
-import java.util.Map;
-
+/**
+ * @author Keyur Vaghani (B00901000)
+ * PersonIdentity Class is to identify the person Uniquly from the family tree
+ */
 public class PersonIdentity {
     private int personId;
     private String name;
-    private String dateOfBirth;
-    private String birthLocation;
-    private String dateOfDeath;
-    private String deathLocation;
-    private String gender;
-    private String occupation;
 
+    /**
+     * getter method for personId
+     * @return : Id of the person
+     */
     public int getPersonId() {return personId;}
 
+    /**
+     * Setter method for the personId
+     * @param personId : get the personId as parameter
+     */
     public void setPersonId(int personId) {this.personId = personId;}
 
-    public String getName() {
-        return name;
-    }
+    /**
+     * getter method for the personName
+     * @return : name of the person
+     */
+    public String getName() {return name;}
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(String dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public String getBirthLocation() {
-        return birthLocation;
-    }
-
-    public void setBirthLocation(String birthLocation) {
-        this.birthLocation = birthLocation;
-    }
-
-    public String getDateOfDeath() {
-        return dateOfDeath;
-    }
-
-    public void setDateOfDeath(String dateOfDeath) {
-        this.dateOfDeath = dateOfDeath;
-    }
-
-    public String getDeathLocation() {
-        return deathLocation;
-    }
-
-    public void setDeathLocation(String deathLocation) {
-        this.deathLocation = deathLocation;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public String getOccupation() {
-        return occupation;
-    }
-
-    public void setOccupation(String occupation) {
-        this.occupation = occupation;
-    }
-
+    /**
+     * setter method for the personName
+     * @param name : take the personName as the parameter
+     */
+    public void setName(String name) {this.name = name;}
 }
