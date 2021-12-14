@@ -1,49 +1,34 @@
 package persistant;
 
 public class FileIdentifier {
+    int fileId;
     String fileName;
     String fileDate;
     String location;
     String province;
     String country;
 
-    public String getFileName() {
-        return fileName;
-    }
+    public int getFileId() {return fileId;}
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
+    public void setFileId(int fileId) {this.fileId = fileId;}
 
-    public String getFileDate() {
-        return fileDate;
-    }
+    public String getFileName() {return fileName;}
 
-    public void setFileDate(String fileDate) {
-        this.fileDate = fileDate;
-    }
+    public void setFileName(String fileName) {this.fileName = fileName;}
 
-    public String getLocation() {
-        return location;
-    }
+    public String getFileDate() {return fileDate;}
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
+    public void setFileDate(String fileDate) {this.fileDate = fileDate;}
 
-    public String getProvince() {
-        return province;
-    }
+    public String getLocation() {return location;}
 
-    public void setProvince(String province) {
-        this.province = province;
-    }
+    public void setLocation(String location) {this.location = location;}
 
-    public String getCountry() {
-        return country;
-    }
+    public String getProvince() {return province;}
 
-    public void setCountry(String country) {
-        this.country = country;
-    }
+    public void setProvince(String province) {this.province = province;}
+
+    public String getCountry() {return country;}
+
+    public void setCountry(String country) {this.country = country;}
 }
